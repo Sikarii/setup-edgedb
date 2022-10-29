@@ -36,6 +36,24 @@ export async function run(): Promise<void> {
     projectDir = null
   }
 
+  if (
+    serverVersion &&
+    serverVersion !== 'nightly' &&
+    serverVersion !== 'stable'
+  ) {
+    const ver = semver.minVersion(serverVersion)
+    if (!ver) {
+      throw new Error(
+        `Failed to parse server-version as semver ${serverVersion}`
+      )
+    }
+
+    serverVersion =
+      ver.prerelease.length > 0
+        ? `${ver.major}.${ver.minor}-${ver.prerelease.join('.')}`
+        : `${ver.major}.${ver.minor}`
+  }
+
   try {
     const cliPath = await installCLI(cliVersion)
 
